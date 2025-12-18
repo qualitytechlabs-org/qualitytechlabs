@@ -1,0 +1,15 @@
+{
+  "navbar": {
+    "home": "Home",
+    "about": "About us",
+    "howItWorks": "How it works?",
+    "services": "Services",
+    "letsTalk": "Let’s Talk"
+  },
+  "hero": {
+    "build_with_heart": "We build with heart.",
+    "ship_with_intent": "Ship with intent.",
+    "aligned_code_design_intent": "Code, design, and intent — aligned.",
+    "help_teams_build": "We help teams build purpose-driven products."
+  }
+}

@@ -1,0 +1,75 @@
+
+   /* Navbar.css */
+.navbar {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    border-radius: 9999px;
+    padding: 0.75rem 2rem;
+    width: fit-content;
+    z-index: 50;
+    gap: 2rem;
+  }
+  
+  /* Logo with stacked text */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-weight: 600;
+  }
+  
+  .navbar-logo img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  /* Middle nav links */
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+  }
+  
+  .navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-links a:hover {
+    color: #f472b6; /* Tailwind pink-400 */
+  }
+  
+  /* CTA Button */
+  .navbar-cta {
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+  
+  .navbar-cta:hover {
+    background: white;
+    color: black;
+  }
+  
+  
