@@ -15,6 +15,7 @@ const Home: React.FC = () => {
       <OurServiceSection/>
       <BuildWaysComparison/>
       <OurProcess/>
+      <h1>This is just for testing ci/cd</h1>
       <FooterMinimal/>
     </div>
   );
