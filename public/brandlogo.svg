@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Background -->
+  <rect width="120" height="120" rx="20" fill="#0B0B0B"></rect>
+
+  <!-- Magnifying Glass -->
+  <circle cx="56" cy="54" r="30" stroke="#FFFFFF" stroke-width="10" fill="none"></circle>
+
+  <rect x="76" y="76" width="28" height="10" rx="5" transform="rotate(45 76 76)" fill="#FFFFFF"></rect>
+
+  <!-- Dots (Eyes) -->
+  <circle cx="48" cy="48" r="6" fill="#F2A89B"></circle>
+  <circle cx="64" cy="42" r="6" fill="#C07A70"></circle>
+
+  <!-- Lamp (Diya) -->
+  <path d="M40 66 
+       Q56 78 72 66 
+       Q56 70 40 66 Z" fill="#F2A89B"></path>
+</svg>
