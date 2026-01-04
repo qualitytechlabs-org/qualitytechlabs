@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../src/Pages/Home';
 import About from '../src/Pages/About';
 import Services from '../src/Pages/Services';
-import Contact from '../src/Pages/Contact';
 import Navbar from '../src/components/Navbar';
 import ChatWidget from '../src/components/Common/ChatWidget';
 import "./i18n/index";

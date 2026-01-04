@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { useTranslation } from "react-i18next";
-import MagnifierBadge from '../components/Common/MagnifierPin';
 import BrandLogo from '../components/Common/BrandLogo';
 import LanguageSwitcher from './Common/LanguageSwitcher';
 

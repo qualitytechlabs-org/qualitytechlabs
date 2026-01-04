@@ -1,17 +1,9 @@
 import React from 'react';
-import { motion, useViewportScroll, useTransform } from 'framer-motion';
+import { motion, useViewportScroll} from 'framer-motion';
 import HeroText from '../Common/HeroText';
 
 const Hero = () => {
-  const { scrollY } = useViewportScroll();
-
-  // Assume next section starts after 100vh
-  const fadeStart = 0;
-  const fadeEnd = 500; // start fading at scrollY = 0, end by 400px
-
-  // const opacity = useTransform(scrollY, [fadeStart, fadeEnd], [1, 0]);
-  // const translateY = useTransform(scrollY, [fadeStart, fadeEnd], [0, -50]);
-
+  
   return (
     <motion.div
       style={{
