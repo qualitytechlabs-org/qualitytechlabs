@@ -114,7 +114,7 @@ const ChatWidget: React.FC<Props> = ({
   launcherSize = 72,
   panelWidth = 360,
 }) => {
-  const [open, setOpen] = useState(true); // set false in prod
+  const [open, setOpen] = useState(false); // set false in prod
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
