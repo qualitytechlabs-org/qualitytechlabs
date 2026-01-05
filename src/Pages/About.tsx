@@ -13,10 +13,7 @@ import valueImg2 from "../assets/dummyImages/value2.png";
 import valueImg3 from "../assets/dummyImages/value3.png";
 import valueImg4 from "../assets/dummyImages/value4.png";
 
-interface DummyImage {
-  id: number;
-  image: string;
-}
+
 
 const ourImages = [
   aboutImg1,
@@ -60,8 +57,7 @@ const leaders = [
 ];
 
 const AboutSection: React.FC = () => {
-  const img = "https://via.placeholder.com/400x250";
-
+  
   return (
     <div className="bg-white text-gray-900">
       {/* HERO SECTION */}
