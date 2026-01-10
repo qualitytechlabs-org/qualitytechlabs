@@ -1,4 +1,4 @@
-import { useState, useEffect , useRef} from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ChatLauncher from "../Common/Chat/ChatLauncher";
 import ChatHeader from "../Common/Chat/ChatHeader";
 import ChatMessages from "../Common/Chat/ChatMessages";
@@ -6,21 +6,13 @@ import ChatInput from "../Common/Chat/ChatInput";
 import { Message, Lead } from "../Common/Chat/types";
 import { QUESTIONS } from "../Common/Chat/questions";
 
-const isLastQuestion = (questionId: keyof typeof QUESTIONS) => {
-  return !QUESTIONS[questionId].options;
-};
-let hasUserInteracted = false;
-
 const ChatWidget = ({ launcherSize = 72, panelWidth = 360 }) => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const soundRef = useRef<HTMLAudioElement | null>(null);
   const unlockedRef = useRef(false);
-  /** ✅ CURRENT QUESTION (single source of truth) */
   const [currentQ, setCurrentQ] =
     useState<keyof typeof QUESTIONS>("SERVICE");
-
-  /** ✅ CHAT MESSAGES */
   const [messages, setMessages] = useState<Message[]>([
     {
       id: crypto.randomUUID(),
@@ -29,32 +21,20 @@ const ChatWidget = ({ launcherSize = 72, panelWidth = 360 }) => {
       options: QUESTIONS.SERVICE.options,
     },
   ]);
-
-  /** ✅ LEAD DATA (dynamic, scalable) */
   const [lead, setLead] = useState<Lead>({});
   const [tries, setTries] = useState<Record<string, number>>({});
+  // useEffect(() => {
+  //   const handler = (e: any) => {
+  //     const { value, next } = e.detail;
+  //     handleAnswer(value, next);
+  //   };
 
-  /**
-   * ✅ HANDLE OPTION CLICK (from ChatOptions)
-   */
-  useEffect(() => {
-    const handler = (e: any) => {
-      const { value, next } = e.detail;
-      handleAnswer(value, next);
-    };
-
-    window.addEventListener("chat-option-selected", handler);
-    return () =>
-      window.removeEventListener("chat-option-selected", handler);
-  }, [currentQ]);
-
- 
-
+  //   window.addEventListener("chat-option-selected", handler);
+  //   return () =>
+  //     window.removeEventListener("chat-option-selected", handler);
+  // }, [currentQ]);
   
-
   
-
-
   useEffect(() => {
     soundRef.current = new Audio("/smsNotifyfinal.m4a");
     soundRef.current.volume = 0.6;
@@ -98,173 +78,313 @@ const ChatWidget = ({ launcherSize = 72, panelWidth = 360 }) => {
     }
   };
   
-  const handleAnswer = (answer: string, explicitNext?: string) => {
-    const isEmail = (v: string) => /\S+@\S+\.\S+/.test(v.trim());
-    const isPhone = (v: string) => {
-      const digitsOnly = v.replace(/\D/g, "");
-      return digitsOnly.length >= 7 && digitsOnly.length <= 15;
-    };
+  // const handleAnswer = (answer: string, explicitNext?: string) => {
+  //   const isEmail = (v: string) => /\S+@\S+\.\S+/.test(v.trim());
+  //   const isPhone = (v: string) => {
+  //     const digitsOnly = v.replace(/\D/g, "");
+  //     return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+  //   };
     
-    const isSkip = (v: string) => {
-      const t = v.trim().toLowerCase();
-      return t === "skip" || t === "no" || t === "na" || t === "not now";
-    };
+  //   const isSkip = (v: string) => {
+  //     const t = v.trim().toLowerCase();
+  //     return t === "skip" || t === "no" || t === "na" || t === "not now";
+  //   };
   
-    const question = QUESTIONS[currentQ];
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        sender: "user",
-        text: answer,
-      },
-    ]);
-    let updatedLead: Lead = lead;
-    if (question.field) {
-      updatedLead = { ...lead, [question.field]: answer };
-      setLead(updatedLead);
-    }
-    if (currentQ === "ASK_EMAIL") {
-      if (isSkip(answer)) {
-        explicitNext = "FINAL";
-      } else if (!isEmail(answer)) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            sender: "bot",
-            text: "⚠️ Please enter a valid email (example@gmail.com) or type 'Skip'.",
-          },
-          {
-            id: crypto.randomUUID(),
-            sender: "bot",
-            text: QUESTIONS.ASK_EMAIL.text,
-            options: QUESTIONS.ASK_EMAIL.options,
-          },
-        ]);
-        return;
-      } else {
-        updatedLead = { ...updatedLead, email: answer.trim() };
+  //   const question = QUESTIONS[currentQ];
+  //   setMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       id: crypto.randomUUID(),
+  //       sender: "user",
+  //       text: answer,
+  //     },
+  //   ]);
+  //   let updatedLead: Lead = lead;
+  //   if (question.field) {
+  //     updatedLead = { ...lead, [question.field]: answer };
+  //     setLead(updatedLead);
+  //   }
+  //   if (currentQ === "ASK_EMAIL") {
+  //     if (isSkip(answer)) {
+  //       explicitNext = "FINAL";
+  //     } else if (!isEmail(answer)) {
+  //       setMessages((prev) => [
+  //         ...prev,
+  //         {
+  //           id: crypto.randomUUID(),
+  //           sender: "bot",
+  //           text: "⚠️ Please enter a valid email (example@gmail.com) or type 'Skip'.",
+  //         },
+  //         {
+  //           id: crypto.randomUUID(),
+  //           sender: "bot",
+  //           text: QUESTIONS.ASK_EMAIL.text,
+  //           options: QUESTIONS.ASK_EMAIL.options,
+  //         },
+  //       ]);
+  //       return;
+  //     } else {
+  //       updatedLead = { ...updatedLead, email: answer.trim() };
+  //       setLead(updatedLead);
+  //       explicitNext = "FINAL";
+  //     }
+  //   }
+  //   if (currentQ === "ASK_PHONE") {
+  //     if (isSkip(answer)) {
+  //       explicitNext = "FINAL";
+  //     } else if (!isPhone(answer)) {
+  //       setMessages((prev) => [
+  //         ...prev,
+  //         {
+  //           id: crypto.randomUUID(),
+  //           sender: "bot",
+  //           text: "⚠️ Please enter a valid 10-digit phone number or type 'Skip'.",
+  //         },
+  //         {
+  //           id: crypto.randomUUID(),
+  //           sender: "bot",
+  //           text: QUESTIONS.ASK_PHONE.text,
+  //           options: QUESTIONS.ASK_PHONE.options,
+  //         },
+  //       ]);
+  //       return;
+  //     } else {
+  //       updatedLead = { ...updatedLead, phone: answer.trim() };
+  //       setLead(updatedLead);
+  //       explicitNext = "FINAL";
+  //     }
+  //   }
+  
+  //   if (currentQ === "CONTACT") {
+  //     const cleaned = answer.trim();
+  //     const valid = isEmail(cleaned) || isPhone(cleaned);
+  
+  //     if (!valid) {
+  //       const attempt = (tries[currentQ] || 0) + 1;
+  //       setTries((prev) => ({ ...prev, [currentQ]: attempt }));
+  
+  //       if (attempt < 3) {
+  //         setMessages((prev) => [
+  //           ...prev,
+  //           {
+  //             id: crypto.randomUUID(),
+  //             sender: "bot",
+  //             text:
+  //               "⚠️ Please enter a valid email (example@gmail.com) OR a 10-digit phone number.",
+  //           },
+  //           {
+  //             id: crypto.randomUUID(),
+  //             sender: "bot",
+  //             text: QUESTIONS.CONTACT.text,
+  //           },
+  //         ]);
+  //         return;
+  //       }
+  //       setMessages((prev) => [
+  //         ...prev,
+  //         {
+  //           id: crypto.randomUUID(),
+  //           sender: "bot",
+  //           text:
+  //             "No worries 🙂 You can skip this step or leave a short message for us.",
+  //           options: [
+  //             { label: "Skip", value: "Skip", next: "FINAL" },
+  //             { label: "📝 Leave a message", value: "Leave a message", next: "MESSAGE" },
+  //           ],
+  //         },
+  //       ]);
+  //       return;
+  //     }
+  //     setTries((prev) => ({ ...prev, [currentQ]: 0 }));
+  //     if (isEmail(cleaned)) {
+  //       updatedLead = { ...updatedLead, email: cleaned, contact: cleaned };
+  //       setLead(updatedLead);
+  //       explicitNext = "ASK_PHONE";
+  //     } else {
+  //       updatedLead = { ...updatedLead, phone: cleaned, contact: cleaned };
+  //       setLead(updatedLead);
+  //       explicitNext = "ASK_EMAIL";
+  //     }
+  //   }
+  //   let nextId = explicitNext;
+  
+  //   if (!nextId && question.options?.length) {
+  //     nextId = question.options[0].next;
+  //   }
+  //   if (!nextId) {
+  //     submitLead(updatedLead);
+  
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       {
+  //         id: crypto.randomUUID(),
+  //         sender: "bot",
+  //         text: "Thanks! Our team will contact you shortly 🙌",
+  //       },
+  //     ]);
+  //     return;
+  //   }
+  
+  //   const nextQuestion = QUESTIONS[nextId];
+  //   if (!nextQuestion) return;
+  
+  //   setCurrentQ(nextId);
+  
+  //   setMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       id: crypto.randomUUID(),
+  //       sender: "bot",
+  //       text: nextQuestion.text,
+  //       options: nextQuestion.options,
+  //     },
+  //   ]);
+  //   if (nextId === "FINAL") {
+  //     console.log("FINAL LEAD OBJECT:", updatedLead);
+  //     submitLead(updatedLead);
+  //   }
+  // };
+  const handleAnswer = useCallback(
+    (answer: string, explicitNext?: string) => {
+      const isEmail = (v: string) => /\S+@\S+\.\S+/.test(v.trim());
+  
+      const isPhone = (v: string) => {
+        const digitsOnly = v.replace(/\D/g, "");
+        return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+      };
+  
+      const isSkip = (v: string) => {
+        const t = v.trim().toLowerCase();
+        return t === "skip" || t === "no" || t === "na" || t === "not now";
+      };
+  
+      const question = QUESTIONS[currentQ];
+  
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), sender: "user", text: answer },
+      ]);
+  
+      let updatedLead: Lead = lead;
+  
+      if (question.field) {
+        updatedLead = { ...lead, [question.field]: answer };
         setLead(updatedLead);
-        explicitNext = "FINAL";
       }
-    }
-    if (currentQ === "ASK_PHONE") {
-      if (isSkip(answer)) {
-        explicitNext = "FINAL";
-      } else if (!isPhone(answer)) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            sender: "bot",
-            text: "⚠️ Please enter a valid 10-digit phone number or type 'Skip'.",
-          },
-          {
-            id: crypto.randomUUID(),
-            sender: "bot",
-            text: QUESTIONS.ASK_PHONE.text,
-            options: QUESTIONS.ASK_PHONE.options,
-          },
-        ]);
-        return;
-      } else {
-        updatedLead = { ...updatedLead, phone: answer.trim() };
-        setLead(updatedLead);
-        explicitNext = "FINAL";
+  
+      // ✅ validations
+      if (currentQ === "ASK_EMAIL") {
+        if (isSkip(answer)) explicitNext = "FINAL";
+        else if (!isEmail(answer)) {
+          setMessages((prev) => [
+            ...prev,
+            { id: crypto.randomUUID(), sender: "bot", text: "⚠️ Please enter a valid email (example@gmail.com) or type 'Skip'." },
+            { id: crypto.randomUUID(), sender: "bot", text: QUESTIONS.ASK_EMAIL.text, options: QUESTIONS.ASK_EMAIL.options },
+          ]);
+          return;
+        } else {
+          updatedLead = { ...updatedLead, email: answer.trim() };
+          setLead(updatedLead);
+          explicitNext = "FINAL";
+        }
       }
-    }
   
-    if (currentQ === "CONTACT") {
-      const cleaned = answer.trim();
-      const valid = isEmail(cleaned) || isPhone(cleaned);
+      if (currentQ === "ASK_PHONE") {
+        if (isSkip(answer)) explicitNext = "FINAL";
+        else if (!isPhone(answer)) {
+          setMessages((prev) => [
+            ...prev,
+            { id: crypto.randomUUID(), sender: "bot", text: "⚠️ Please enter a valid phone number or type 'Skip'." },
+            { id: crypto.randomUUID(), sender: "bot", text: QUESTIONS.ASK_PHONE.text, options: QUESTIONS.ASK_PHONE.options },
+          ]);
+          return;
+        } else {
+          updatedLead = { ...updatedLead, phone: answer.trim() };
+          setLead(updatedLead);
+          explicitNext = "FINAL";
+        }
+      }
   
-      if (!valid) {
-        const attempt = (tries[currentQ] || 0) + 1;
-        setTries((prev) => ({ ...prev, [currentQ]: attempt }));
+      if (currentQ === "CONTACT") {
+        const cleaned = answer.trim();
+        const valid = isEmail(cleaned) || isPhone(cleaned);
   
-        if (attempt < 3) {
+        if (!valid) {
+          const attempt = (tries[currentQ] || 0) + 1;
+          setTries((prev) => ({ ...prev, [currentQ]: attempt }));
+  
+          if (attempt < 3) {
+            setMessages((prev) => [
+              ...prev,
+              { id: crypto.randomUUID(), sender: "bot", text: "⚠️ Please enter a valid email OR phone number." },
+              { id: crypto.randomUUID(), sender: "bot", text: QUESTIONS.CONTACT.text },
+            ]);
+            return;
+          }
+  
           setMessages((prev) => [
             ...prev,
             {
               id: crypto.randomUUID(),
               sender: "bot",
-              text:
-                "⚠️ Please enter a valid email (example@gmail.com) OR a 10-digit phone number.",
-            },
-            {
-              id: crypto.randomUUID(),
-              sender: "bot",
-              text: QUESTIONS.CONTACT.text,
+              text: "No worries 🙂 You can skip this step or leave a short message for us.",
+              options: [
+                { label: "Skip", value: "Skip", next: "FINAL" },
+                { label: "📝 Leave a message", value: "Leave a message", next: "MESSAGE" },
+              ],
             },
           ]);
           return;
         }
+  
+        setTries((prev) => ({ ...prev, [currentQ]: 0 }));
+  
+        if (isEmail(cleaned)) {
+          updatedLead = { ...updatedLead, email: cleaned, contact: cleaned };
+          setLead(updatedLead);
+          explicitNext = "ASK_PHONE";
+        } else {
+          updatedLead = { ...updatedLead, phone: cleaned, contact: cleaned };
+          setLead(updatedLead);
+          explicitNext = "ASK_EMAIL";
+        }
+      }
+  
+      let nextId = explicitNext;
+      if (!nextId && question.options?.length) nextId = question.options[0].next;
+  
+      if (!nextId) {
+        submitLead(updatedLead);
         setMessages((prev) => [
           ...prev,
-          {
-            id: crypto.randomUUID(),
-            sender: "bot",
-            text:
-              "No worries 🙂 You can skip this step or leave a short message for us.",
-            options: [
-              { label: "Skip", value: "Skip", next: "FINAL" },
-              { label: "📝 Leave a message", value: "Leave a message", next: "MESSAGE" },
-            ],
-          },
+          { id: crypto.randomUUID(), sender: "bot", text: "Thanks! Our team will contact you shortly 🙌" },
         ]);
         return;
       }
-      setTries((prev) => ({ ...prev, [currentQ]: 0 }));
-      if (isEmail(cleaned)) {
-        updatedLead = { ...updatedLead, email: cleaned, contact: cleaned };
-        setLead(updatedLead);
-        explicitNext = "ASK_PHONE";
-      } else {
-        updatedLead = { ...updatedLead, phone: cleaned, contact: cleaned };
-        setLead(updatedLead);
-        explicitNext = "ASK_EMAIL";
-      }
-    }
-    let nextId = explicitNext;
   
-    if (!nextId && question.options?.length) {
-      nextId = question.options[0].next;
-    }
-    if (!nextId) {
-      submitLead(updatedLead);
+      const nextQuestion = QUESTIONS[nextId];
+      if (!nextQuestion) return;
+  
+      setCurrentQ(nextId);
   
       setMessages((prev) => [
         ...prev,
-        {
-          id: crypto.randomUUID(),
-          sender: "bot",
-          text: "Thanks! Our team will contact you shortly 🙌",
-        },
+        { id: crypto.randomUUID(), sender: "bot", text: nextQuestion.text, options: nextQuestion.options },
       ]);
-      return;
-    }
   
-    const nextQuestion = QUESTIONS[nextId];
-    if (!nextQuestion) return;
+      if (nextId === "FINAL") submitLead(updatedLead);
+    },
+    [currentQ, lead, tries] // ✅ correct deps
+  );
+  useEffect(() => {
+    const handler = (e: any) => {
+      const { value, next } = e.detail;
+      handleAnswer(value, next);
+    };
   
-    setCurrentQ(nextId);
-  
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        sender: "bot",
-        text: nextQuestion.text,
-        options: nextQuestion.options,
-      },
-    ]);
-    if (nextId === "FINAL") {
-      console.log("FINAL LEAD OBJECT:", updatedLead);
-      submitLead(updatedLead);
-    }
-  };
-  
+    window.addEventListener("chat-option-selected", handler);
+    return () => window.removeEventListener("chat-option-selected", handler);
+  }, [handleAnswer]);
   useEffect(() => {
     const alreadyOpened = sessionStorage.getItem("chat_auto_opened");
     if (alreadyOpened) return;
