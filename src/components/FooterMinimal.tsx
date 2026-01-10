@@ -66,7 +66,7 @@ const FooterMinimal: React.FC = () => {
           <div className="md:col-span-5 md:pl-6">
             {/* socials */}
             <div className="flex md:justify-end gap-4 mb-5">
-              <a href="https://facebook.example" aria-label="Facebook">
+              <a href="https://www.facebook.com/profile.php?id=61586100063452" aria-label="Facebook">
                 <OutlineIcon label="Facebook">
                   <path
                     d="M13 22v-8h3l.5-3H13V8.8c0-1.2.4-1.8 1.9-1.8H17V4.1C16 4 15 3.9 13.8 3.9 11.2 3.9 9.5 5.6 9.5 8.6V11H7v3h2.5v8"
@@ -78,7 +78,7 @@ const FooterMinimal: React.FC = () => {
                   />
                 </OutlineIcon>
               </a>
-              <a href="https://instagram.example" aria-label="Instagram">
+              <a href="https://www.instagram.com/quality.techlabs/?hl=en" aria-label="Instagram">
                 <OutlineIcon label="Instagram">
                   <rect
                     x="4"
@@ -94,7 +94,7 @@ const FooterMinimal: React.FC = () => {
                   <circle cx="17.3" cy="6.7" r="1" fill="currentColor" />
                 </OutlineIcon>
               </a>
-              <a href="https://twitter.example" aria-label="Twitter/X">
+              <a href="https://x.com/QualityTechLabs" aria-label="Twitter/X">
                 <OutlineIcon label="Twitter">
                   <path
                     d="M4 6l7.5 12M20 6L8.5 18M6 18h12"
@@ -106,7 +106,7 @@ const FooterMinimal: React.FC = () => {
                   />
                 </OutlineIcon>
               </a>
-              <a href="https://dribbble.example" aria-label="Dribbble">
+              <a href="https://dribbble.com/business2932" aria-label="Dribbble">
                 <OutlineIcon label="Dribbble">
                   <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.6" />
                   <path

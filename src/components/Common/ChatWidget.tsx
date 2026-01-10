@@ -1,298 +1,361 @@
-// // components/ChatWidget.tsx
-// import React, { useEffect, useRef, useState } from "react";
-// import HeadImg from "../../assets/chat.svg"; // your head image
+import { useState, useEffect , useRef} from "react";
+import ChatLauncher from "../Common/Chat/ChatLauncher";
+import ChatHeader from "../Common/Chat/ChatHeader";
+import ChatMessages from "../Common/Chat/ChatMessages";
+import ChatInput from "../Common/Chat/ChatInput";
+import { Message, Lead } from "../Common/Chat/types";
+import { QUESTIONS } from "../Common/Chat/questions";
 
-// type Props = {
-//   size?: number; // px size of the head image
-// };
-
-// const ChatWidget: React.FC<Props> = ({ size = 90 }) => {
-//   const [open, setOpen] = useState(false);
-//   const inputRef = useRef<HTMLInputElement>(null);
-
-//   useEffect(() => {
-//     if (open) inputRef.current?.focus();
-//   }, [open]);
-
-//   return (
-//     <>
-//       {/* Floating Head */}
-//       <button
-//         aria-label={open ? "Chat launcher (panel open)" : "Open chat"}
-//         onClick={() => setOpen(!open)}
-//         className={[
-//           "fixed z-[900]",
-//           "right-[calc(1.25rem+env(safe-area-inset-right,0px))]",
-//           "bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))]",
-//           "transition hover:scale-[1.05] active:scale-[0.98]",
-//         ].join(" ")}
-//         style={{ width: size, height: size }}
-//       >
-//         <img
-//           src={HeadImg}
-//           alt="Chat"
-//           className="w-full h-full object-contain"
-//           draggable={false}
-//         />
-//       </button>
-
-//       {/* Chat Panel */}
-//       {open && (
-//         <div
-//           className="fixed z-[1000] w-[380px] max-w-[92vw] overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] text-white shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
-//           style={{
-//             right: "calc(1.25rem + env(safe-area-inset-right,0px))",
-//             bottom: `${size + 16}px`, // gap above head
-//           }}
-//           role="dialog"
-//           aria-modal="true"
-//         >
-//           <header className="flex items-center justify-between px-4 py-3 bg-white/5">
-//             <span className="text-sm font-semibold">Chat with us</span>
-//             <button
-//               onClick={() => setOpen(false)}
-//               aria-label="Close chat"
-//               className="p-1 hover:bg-white/10 rounded"
-//             >
-//               <svg
-//                 viewBox="0 0 24 24"
-//                 className="h-5 w-5"
-//                 stroke="currentColor"
-//                 strokeWidth="2"
-//                 fill="none"
-//               >
-//                 <path d="M6 6l12 12M18 6L6 18" />
-//               </svg>
-//             </button>
-//           </header>
-
-//           <div className="h-64 overflow-y-auto px-4 py-3 space-y-3 text-sm">
-//             <div className="max-w-[85%] rounded-xl bg-white/10 px-3 py-2">
-//               Hey! How can we help?
-//             </div>
-//           </div>
-
-//           <form
-//             onSubmit={(e) => {
-//               e.preventDefault();
-//               (e.target as HTMLFormElement).reset();
-//               inputRef.current?.focus();
-//             }}
-//             className="flex items-center gap-2 p-3 bg-white/5"
-//           >
-//             <input
-//               ref={inputRef}
-//               type="text"
-//               placeholder="Type a message…"
-//               className="flex-1 rounded-full bg-black/40 border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/30"
-//             />
-//             <button
-//               type="submit"
-//               className="rounded-full bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-400"
-//             >
-//               Send
-//             </button>
-//           </form>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default ChatWidget;
-// components/ChatWidget.tsx
-import React, { useEffect, useRef, useState } from "react";
-import HeadImg from "../../assets/chat.svg"; // launcher (blue head)
-import HeaderHead from "../../assets/chat.svg"; // header avatar (can be a different asset)
-
-type Props = {
-  launcherSize?: number;   // size of floating head button
-  panelWidth?: number;     // chat panel width
+const isLastQuestion = (questionId: keyof typeof QUESTIONS) => {
+  return !QUESTIONS[questionId].options;
 };
+let hasUserInteracted = false;
 
-const ChatWidget: React.FC<Props> = ({
-  launcherSize = 72,
-  panelWidth = 360,
-}) => {
-  const [open, setOpen] = useState(false); // set false in prod
-  const inputRef = useRef<HTMLInputElement>(null);
+const ChatWidget = ({ launcherSize = 72, panelWidth = 360 }) => {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const soundRef = useRef<HTMLAudioElement | null>(null);
+  const unlockedRef = useRef(false);
+  /** ✅ CURRENT QUESTION (single source of truth) */
+  const [currentQ, setCurrentQ] =
+    useState<keyof typeof QUESTIONS>("SERVICE");
+
+  /** ✅ CHAT MESSAGES */
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: crypto.randomUUID(),
+      sender: "bot",
+      text: QUESTIONS.SERVICE.text,
+      options: QUESTIONS.SERVICE.options,
+    },
+  ]);
+
+  /** ✅ LEAD DATA (dynamic, scalable) */
+  const [lead, setLead] = useState<Lead>({});
+  const [tries, setTries] = useState<Record<string, number>>({});
+
+  /**
+   * ✅ HANDLE OPTION CLICK (from ChatOptions)
+   */
+  useEffect(() => {
+    const handler = (e: any) => {
+      const { value, next } = e.detail;
+      handleAnswer(value, next);
+    };
+
+    window.addEventListener("chat-option-selected", handler);
+    return () =>
+      window.removeEventListener("chat-option-selected", handler);
+  }, [currentQ]);
+
+ 
+
+  
+
+  
+
 
   useEffect(() => {
-    if (open) inputRef.current?.focus();
-  }, [open]);
+    soundRef.current = new Audio("/smsNotifyfinal.m4a");
+    soundRef.current.volume = 0.6;
+    soundRef.current.load();
+    const unlock = async () => {
+      if (!soundRef.current || unlockedRef.current) return;
+
+      try {
+        soundRef.current.muted = true;
+        await soundRef.current.play(); 
+        soundRef.current.pause();
+        soundRef.current.currentTime = 0;
+        soundRef.current.muted = false;
+
+        unlockedRef.current = true;
+        console.log("Sound unlocked");
+      } catch (err) {
+        console.log("Unlock failed:", err);
+      }
+    };
+
+    window.addEventListener("click", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+    window.addEventListener("touchstart", unlock, { once: true });
+
+    return () => {
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("touchstart", unlock);
+    };
+  }, []);
+
+  const playNotificationSound = async () => {
+    if (!soundRef.current) return;
+
+    try {
+      soundRef.current.currentTime = 0;
+      await soundRef.current.play();
+    } catch (err) {
+      console.log("Sound blocked:", err);
+    }
+  };
+  
+  const handleAnswer = (answer: string, explicitNext?: string) => {
+    const isEmail = (v: string) => /\S+@\S+\.\S+/.test(v.trim());
+    const isPhone = (v: string) => {
+      const digitsOnly = v.replace(/\D/g, "");
+      return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+    };
+    
+    const isSkip = (v: string) => {
+      const t = v.trim().toLowerCase();
+      return t === "skip" || t === "no" || t === "na" || t === "not now";
+    };
+  
+    const question = QUESTIONS[currentQ];
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        sender: "user",
+        text: answer,
+      },
+    ]);
+    let updatedLead: Lead = lead;
+    if (question.field) {
+      updatedLead = { ...lead, [question.field]: answer };
+      setLead(updatedLead);
+    }
+    if (currentQ === "ASK_EMAIL") {
+      if (isSkip(answer)) {
+        explicitNext = "FINAL";
+      } else if (!isEmail(answer)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            sender: "bot",
+            text: "⚠️ Please enter a valid email (example@gmail.com) or type 'Skip'.",
+          },
+          {
+            id: crypto.randomUUID(),
+            sender: "bot",
+            text: QUESTIONS.ASK_EMAIL.text,
+            options: QUESTIONS.ASK_EMAIL.options,
+          },
+        ]);
+        return;
+      } else {
+        updatedLead = { ...updatedLead, email: answer.trim() };
+        setLead(updatedLead);
+        explicitNext = "FINAL";
+      }
+    }
+    if (currentQ === "ASK_PHONE") {
+      if (isSkip(answer)) {
+        explicitNext = "FINAL";
+      } else if (!isPhone(answer)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            sender: "bot",
+            text: "⚠️ Please enter a valid 10-digit phone number or type 'Skip'.",
+          },
+          {
+            id: crypto.randomUUID(),
+            sender: "bot",
+            text: QUESTIONS.ASK_PHONE.text,
+            options: QUESTIONS.ASK_PHONE.options,
+          },
+        ]);
+        return;
+      } else {
+        updatedLead = { ...updatedLead, phone: answer.trim() };
+        setLead(updatedLead);
+        explicitNext = "FINAL";
+      }
+    }
+  
+    if (currentQ === "CONTACT") {
+      const cleaned = answer.trim();
+      const valid = isEmail(cleaned) || isPhone(cleaned);
+  
+      if (!valid) {
+        const attempt = (tries[currentQ] || 0) + 1;
+        setTries((prev) => ({ ...prev, [currentQ]: attempt }));
+  
+        if (attempt < 3) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: crypto.randomUUID(),
+              sender: "bot",
+              text:
+                "⚠️ Please enter a valid email (example@gmail.com) OR a 10-digit phone number.",
+            },
+            {
+              id: crypto.randomUUID(),
+              sender: "bot",
+              text: QUESTIONS.CONTACT.text,
+            },
+          ]);
+          return;
+        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            sender: "bot",
+            text:
+              "No worries 🙂 You can skip this step or leave a short message for us.",
+            options: [
+              { label: "Skip", value: "Skip", next: "FINAL" },
+              { label: "📝 Leave a message", value: "Leave a message", next: "MESSAGE" },
+            ],
+          },
+        ]);
+        return;
+      }
+      setTries((prev) => ({ ...prev, [currentQ]: 0 }));
+      if (isEmail(cleaned)) {
+        updatedLead = { ...updatedLead, email: cleaned, contact: cleaned };
+        setLead(updatedLead);
+        explicitNext = "ASK_PHONE";
+      } else {
+        updatedLead = { ...updatedLead, phone: cleaned, contact: cleaned };
+        setLead(updatedLead);
+        explicitNext = "ASK_EMAIL";
+      }
+    }
+    let nextId = explicitNext;
+  
+    if (!nextId && question.options?.length) {
+      nextId = question.options[0].next;
+    }
+    if (!nextId) {
+      submitLead(updatedLead);
+  
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          sender: "bot",
+          text: "Thanks! Our team will contact you shortly 🙌",
+        },
+      ]);
+      return;
+    }
+  
+    const nextQuestion = QUESTIONS[nextId];
+    if (!nextQuestion) return;
+  
+    setCurrentQ(nextId);
+  
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        sender: "bot",
+        text: nextQuestion.text,
+        options: nextQuestion.options,
+      },
+    ]);
+    if (nextId === "FINAL") {
+      console.log("FINAL LEAD OBJECT:", updatedLead);
+      submitLead(updatedLead);
+    }
+  };
+  
+  useEffect(() => {
+    const alreadyOpened = sessionStorage.getItem("chat_auto_opened");
+    if (alreadyOpened) return;
+    let opened = false;
+    const openChat = () => {
+      if (opened) return;
+      if (!document.hasFocus()) return;
+
+      opened = true;
+      setOpen(true);
+      playNotificationSound();
+      sessionStorage.setItem("chat_auto_opened", "true");
+
+      window.removeEventListener("scroll", onScroll);
+    };
+    const timer = setTimeout(openChat, 9000);
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+
+      const scrolled = window.scrollY / scrollable;
+
+      if (scrolled >= 0.4) {
+        clearTimeout(timer);
+        openChat();
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+
+
+  const submitLead = async (finalLead: Lead) => {
+
+    console.log("finalLead payload #####", finalLead);
+    // try {
+    //   await fetch("http://localhost:5000/api/leads", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       ...finalLead,
+    //       source: "chatbot",
+    //       createdAt: new Date().toISOString(),
+    //     }),
+    //   });
+    // } catch (err) {
+    //   console.error("Lead submission failed", err);
+    // }
+  };
+
 
   return (
     <>
-      {/* ===== Floating launcher (no white background) ===== */}
-      <button
-        type="button"
-        onClick={() => setOpen((s) => !s)}
-        aria-label={open ? "Hide chat" : "Open chat"}
-        className="fixed z-[900] transition hover:scale-[1.04] active:scale-[0.98]"
-        style={{
-          right: "calc(1.0rem + env(safe-area-inset-right,0px))",
-          bottom: "calc(1.0rem + env(safe-area-inset-bottom,0px))",
-          width: launcherSize,
-          height: launcherSize,
-          // subtle drop-shadow behind the head
-          filter: "drop-shadow(0 12px 22px rgba(0,0,0,0.35))",
+      <ChatLauncher
+        open={open}
+        toggle={() => {
+          setOpen(!open);
+          if (!open) playNotificationSound();
         }}
-      >
-        <img
-          src={HeadImg}
-          alt="Chat"
-          draggable={false}
-          className="h-full w-full object-contain"
-        />
-      </button>
+        size={launcherSize}
+      />
 
-      {/* ===== Chat panel (smaller, cleaner) ===== */}
       {open && (
         <section
-          className="fixed z-[1000] rounded-[16px] bg-white text-[#111] border border-black/8 overflow-hidden"
+          className="fixed z-[1000] bg-white rounded-[16px]"
           style={{
-            right: "calc(1.0rem + env(safe-area-inset-right,0px))",
-            bottom: `calc(${launcherSize}px + 14px)`,
             width: panelWidth,
-            // shadow a bit softer than before
-            boxShadow: "0 22px 48px rgba(0,0,0,0.38)",
+            right: "1rem",
+            bottom: launcherSize + 14,
           }}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Chat"
         >
-          {/* Header */}
-          <header className="relative flex items-center gap-3 px-4 py-3 bg-white">
-            {/* smaller header avatar with a very light halo */}
-            <div className="h-7 w-7 rounded-full overflow-hidden ring-1 ring-black/5 bg-[#F4F7FF]">
-              <img
-                src={HeaderHead}
-                alt=""
-                className="h-full w-full object-cover"
-                draggable={false}
-              />
-            </div>
-            <h3 className="text-[18px] font-semibold">Lexi</h3>
-
-            {/* close button: small round white, crisp black “×” */}
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Close chat"
-              className="ml-auto grid place-items-center h-8 w-8 rounded-full bg-white border border-black/10 hover:bg-black/5 transition"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4.5 w-4.5"
-                stroke="#111"
-                strokeWidth="2.2"
-                fill="none"
-                strokeLinecap="round"
-              >
-                <path d="M6 6L18 18M18 6L6 18" />
-              </svg>
-            </button>
-
-            {/* hairline divider like the screenshot */}
-            <span className="absolute inset-x-0 bottom-0 h-px bg-black/10" />
-          </header>
-
-          {/* Scrollable messages area (shorter height) */}
-          <div className="h-[420px] overflow-y-auto px-4 py-4 space-y-4">
-            {/* day/time chip */}
-            <div className="text-center">
-              <span className="inline-block rounded-full bg-black/6 text-[11px] leading-[18px] px-3 text-black/65">
-                Wed 8:21 AM
-              </span>
-            </div>
-
-            {/* bot bubble */}
-            <div className="flex items-start gap-3">
-              <div className="mt-1 h-6 w-6 rounded-full overflow-hidden ring-1 ring-black/5 bg-[#F4F7FF]">
-                <img src={HeaderHead} alt="" className="h-full w-full object-cover" />
-              </div>
-              <div className="max-w-[80%] rounded-[14px] bg-[#F2F2F2] px-3.5 py-3 text-[15px] leading-[1.35] shadow-sm">
-                <p>Hello, I’m Lexi. I’m your personal assistant.</p>
-                <p className="mt-1">How can I help you?</p>
-              </div>
-            </div>
-
-            {/* user bubble (right) */}
-            <div className="flex justify-end">
-              <div className="max-w-[74%]">
-                <div className="rounded-[14px] bg-[#DDE7FF] px-3.5 py-3 text-[15px] leading-[1.35] shadow-sm">
-                  Hello, I’m Nilam
-                </div>
-                <div className="mt-1 flex items-center gap-2 text-[11px] text-black/60">
-                  <span className="inline-block rounded bg-black/6 px-2 py-[2px]">
-                    8:22 AM
-                  </span>
-                  {/* tiny icons (read / edit) */}
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    fill="none"
-                    className="opacity-60"
-                  >
-                    <path d="M9 12l2 2 4-4" strokeWidth="2" />
-                    <circle cx="12" cy="12" r="9" strokeWidth="2" />
-                  </svg>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    fill="none"
-                    className="opacity-60"
-                  >
-                    <path d="M16 4l4 4-12 12H4v-4L16 4z" strokeWidth="2" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Composer (large rounded input; white send button) */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              (e.target as HTMLFormElement).reset();
-              inputRef.current?.focus();
+          <ChatHeader onClose={() => setOpen(false)} />
+          <ChatMessages messages={messages} />
+          <ChatInput
+            value={input}
+            onChange={setInput}
+            onSend={() => {
+              if (!input.trim()) return;
+              handleAnswer(input);
+              setInput("");
             }}
-            className="border-t border-black/10 bg-white"
-          >
-            <div className="px-4 py-3">
-              <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Type your message here…"
-                  className="flex-1 h-12 rounded-[14px] bg-[#F3F3F3] px-4 text-[15px] outline-none ring-1 ring-black/10 focus:ring-black/20"
-                />
-                <button
-                  type="submit"
-                  aria-label="Send"
-                  className="grid place-items-center h-12 w-12 rounded-[14px] bg-white border border-black/10 hover:bg-black/5 transition"
-                >
-                  {/* paper-plane */}
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-[19px] w-[19px]"
-                    fill="none"
-                    stroke="#111"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M22 2L11 13" />
-                    <path d="M22 2l-7 20-4-9-9-4 20-7z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </form>
+          />
         </section>
       )}
     </>
