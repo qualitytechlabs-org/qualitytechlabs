@@ -427,21 +427,22 @@ const ChatWidget = ({ launcherSize = 72, panelWidth = 360 }) => {
   const submitLead = async (finalLead: Lead) => {
 
     console.log("finalLead payload #####", finalLead);
-    // try {
-    //   await fetch("http://localhost:5000/api/leads", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       ...finalLead,
-    //       source: "chatbot",
-    //       createdAt: new Date().toISOString(),
-    //     }),
-    //   });
-    // } catch (err) {
-    //   console.error("Lead submission failed", err);
-    // }
+    try {
+      const res = await fetch("https://d0d6y5a9ml.execute-api.ap-south-1.amazonaws.com/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...finalLead,
+          source: "chatbot",
+          createdAt: new Date().toISOString(),
+        }),
+      });
+      console.log("Response data is...", res);
+    } catch (err) {
+      console.error("Lead submission failed", err);
+    }
   };
 
 
