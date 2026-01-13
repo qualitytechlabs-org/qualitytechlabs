@@ -21,7 +21,7 @@ const ContactUs: React.FC = () => {
             Experience That Lasts
           </h1>
 
-          <div className="email">✉️ info@oracletechlab@gmail.com</div>
+          <div className="email">✉️ business@qualitytechlabs.com</div>
           <div className="flex  gap-4 mb-5">
             <SocialMedia />
           </div>
