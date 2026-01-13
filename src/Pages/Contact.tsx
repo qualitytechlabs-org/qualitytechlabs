@@ -1,152 +1,58 @@
-// import React, { useEffect, useState } from "react";
+import React from "react";
+import "../css/ContactPage.css";
+import FooterMinimal from "../components/FooterMinimal";
+import NextSteps from "../components/NextSteps";
+import SocialMedia from "../components/SocialMedia";
 
-// const Contact = () => {
-//   const [scrollProgress, setScrollProgress] = useState(0);
-
-//   useEffect(() => {
-//     const handleScroll = () => {
-//       const hero = document.getElementById("hero");
-//       if (!hero) return;
-
-//       const rect = hero.getBoundingClientRect();
-//       const windowHeight = window.innerHeight;
-
-//       if (rect.top < windowHeight && rect.bottom > 0) {
-//         const scrollAmount = windowHeight - rect.top;
-//         const scrollPercent = Math.min(scrollAmount / windowHeight, 1);
-//         setScrollProgress(scrollPercent);
-//       }
-//     };
-
-//     window.addEventListener("scroll", handleScroll);
-//     return () => window.removeEventListener("scroll", handleScroll);
-//   }, []);
-
-//   const boxWidth = 200; // px
-//   const gapBetweenBoxes = 0; // final gap when they touch
-//   const maxOffset = `calc(50vw - ${boxWidth}px)`; // max distance from left/right to center
-//   const leftTransform = `translateX(${scrollProgress * 50}vw)`; // 0 to 50vw
-//   const rightTransform = `translateX(-${scrollProgress * 50}vw)`; // 0 to -50vw
-
-//   return (
-//     <section
-//       id="hero"
-//       style={{
-//         height: "100vh",
-//         background: "#f3f4f6",
-//         overflow: "hidden",
-//         position: "relative",
-//       }}
-//     >
-//       <h1 style={{ textAlign: "center", paddingTop: "2rem", fontSize: "2rem" }}>
-//         Scroll Down – Boxes Will Meet in Center
-//       </h1>
-
-//       {/* Left Box */}
-//       <div
-//         style={{
-//           position: "absolute",
-//           top: "40%",
-//           left: 0,
-//           width: `${boxWidth}px`,
-//           height: "200px",
-//           backgroundColor: "#3b82f6",
-//           color: "#fff",
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           fontWeight: "bold",
-//           transform: leftTransform,
-//           transition: "transform 0.1s linear",
-//         }}
-//       >
-//         Box A
-//       </div>
-
-//       {/* Right Box */}
-//       <div
-//         style={{
-//           position: "absolute",
-//           top: "40%",
-//           right: 0,
-//           width: `${boxWidth}px`,
-//           height: "200px",
-//           backgroundColor: "#ef4444",
-//           color: "#fff",
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           fontWeight: "bold",
-//           transform: rightTransform,
-//           transition: "transform 0.1s linear",
-//         }}
-//       >
-//         Box B
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default Contact;
-
-// App.tsx or any component
-import React, { useRef, useEffect } from 'react';
-
-const GalaxyCanvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    let stars = Array(200).fill(0).map(() => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      radius: Math.random() * 1.5,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: (Math.random() - 0.5) * 0.2,
-    }));
-
-    function animate() {
-      ctx.fillStyle = '#0e0e0e';
-      ctx.fillRect(0, 0, width, height);
-      ctx.fillStyle = 'white';
-      stars.forEach((star) => {
-        star.x += star.vx;
-        star.y += star.vy;
-        if (star.x < 0 || star.x > width) star.vx *= -1;
-        if (star.y < 0 || star.y > height) star.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
-        ctx.fill();
-      });
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
-  }, []);
+const ContactUs: React.FC = () => {
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    console.log("Form submitted");
+  };
 
   return (
-    // <canvas
-    //   ref={canvasRef}
-    //   style={{
-    //     position: 'absolute',
-    //     top: 0,
-    //     left: 0,
-    //     zIndex: 0,
-    //     width: '100%',
-    //     height: '100%',
-    //   }}
-    // />
-    <p>Hello</p>
+    <div className="page">
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-left">
+          <p className="tagline">CONNECT WITH US!</p>
+          <h1>
+            Turn Your Vision Into an <br />
+            Experience That Lasts
+          </h1>
+
+          <div className="email">✉️ business@qualitytechlabs.com</div>
+          <div className="flex  gap-4 mb-5">
+            <SocialMedia />
+          </div>
+        </div>
+
+        <div className="hero-right">
+          <h2>Let’s Talk</h2>
+
+          <form className="form" onSubmit={handleSubmit}>
+            <input type="text" placeholder="Full Name" />
+            <input type="email" placeholder="Email" />
+            <input type="text" placeholder="Company" />
+            <input type="tel" placeholder="Phone number" />
+            <textarea placeholder="Message" />
+
+            <button type="submit" className="submit-btn">
+              Submit
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <NextSteps />
+
+      {/* Footer */}
+      <FooterMinimal />
+    </div>
   );
 };
 
-export default GalaxyCanvas;
+export default ContactUs;
+
+//  Send it to the moon 🚀

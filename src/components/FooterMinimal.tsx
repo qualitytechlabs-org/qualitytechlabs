@@ -1,5 +1,6 @@
 // components/Common/FooterMinimal.tsx
 import React from "react";
+import SocialMedia from "./SocialMedia";
 
 const OutlineIcon: React.FC<
   React.SVGProps<SVGSVGElement> & { label: string }
@@ -57,7 +58,8 @@ const FooterMinimal: React.FC = () => {
             >
               <span className="text-xl leading-none">🇮🇳</span>
               <span className="text-xs leading-5 text-white/85">
-                C-312 Gali no 13, Mulla Colony, Vasundhara enclave, East Delhi 110096
+                C-312 Gali no 13, Mulla Colony, Vasundhara enclave, East Delhi
+                110096
               </span>
             </a>
           </div>
@@ -66,73 +68,52 @@ const FooterMinimal: React.FC = () => {
           <div className="md:col-span-5 md:pl-6">
             {/* socials */}
             <div className="flex md:justify-end gap-4 mb-5">
-              <a href="https://www.facebook.com/profile.php?id=61586100063452" aria-label="Facebook">
-                <OutlineIcon label="Facebook">
-                  <path
-                    d="M13 22v-8h3l.5-3H13V8.8c0-1.2.4-1.8 1.9-1.8H17V4.1C16 4 15 3.9 13.8 3.9 11.2 3.9 9.5 5.6 9.5 8.6V11H7v3h2.5v8"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </OutlineIcon>
-              </a>
-              <a href="https://www.instagram.com/quality.techlabs/?hl=en" aria-label="Instagram">
-                <OutlineIcon label="Instagram">
-                  <rect
-                    x="4"
-                    y="4"
-                    width="16"
-                    height="16"
-                    rx="4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                  />
-                  <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
-                  <circle cx="17.3" cy="6.7" r="1" fill="currentColor" />
-                </OutlineIcon>
-              </a>
-              <a href="https://x.com/QualityTechLabs" aria-label="Twitter/X">
-                <OutlineIcon label="Twitter">
-                  <path
-                    d="M4 6l7.5 12M20 6L8.5 18M6 18h12"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </OutlineIcon>
-              </a>
-              <a href="https://dribbble.com/business2932" aria-label="Dribbble">
-                <OutlineIcon label="Dribbble">
-                  <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.6" />
-                  <path
-                    d="M5 9c5 0 10 2 14 7M5.5 14.5c3.5-1 8.2-1 13 1M9 4.5c2.5 3 4.5 7 6 14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </OutlineIcon>
-              </a>
+              <SocialMedia />
             </div>
 
             {/* link columns */}
             <div className="grid grid-cols-2 gap-8 text-sm">
               <div className="space-y-2">
                 <p className="text-white/60">Company</p>
-                <a href="/about" className="block text-white/80 hover:text-white">About us</a>
-                <a href="/services" className="block text-white/80 hover:text-white">Services</a>
-                <a href="/team" className="block text-white/80 hover:text-white">Our team</a>
+                <a
+                  href="/about"
+                  className="block text-white/80 hover:text-white"
+                >
+                  About us
+                </a>
+                <a
+                  href="/services"
+                  className="block text-white/80 hover:text-white"
+                >
+                  Services
+                </a>
+                <a
+                  href="/team"
+                  className="block text-white/80 hover:text-white"
+                >
+                  Our team
+                </a>
               </div>
               <div className="space-y-2 md:text-right">
                 <p className="text-white/60">Work</p>
-                <a href="/work" className="block text-white/80 hover:text-white">Our Work</a>
-                <a href="/careers" className="block text-white/80 hover:text-white">Join us</a>
-                <a href="/contact" className="block text-white/80 hover:text-white">Contact us</a>
+                <a
+                  href="/work"
+                  className="block text-white/80 hover:text-white"
+                >
+                  Our Work
+                </a>
+                <a
+                  href="/careers"
+                  className="block text-white/80 hover:text-white"
+                >
+                  Join us
+                </a>
+                <a
+                  href="/contact"
+                  className="block text-white/80 hover:text-white"
+                >
+                  Contact us
+                </a>
               </div>
             </div>
           </div>

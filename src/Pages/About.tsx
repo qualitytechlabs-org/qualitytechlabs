@@ -12,8 +12,8 @@ import valueImg1 from "../assets/dummyImages/value1.png";
 import valueImg2 from "../assets/dummyImages/value2.png";
 import valueImg3 from "../assets/dummyImages/value3.png";
 import valueImg4 from "../assets/dummyImages/value4.png";
-
-
+import FooterMinimal from "../components/FooterMinimal";
+import NextSteps from "../components/NextSteps";
 
 const ourImages = [
   aboutImg1,
@@ -57,7 +57,6 @@ const leaders = [
 ];
 
 const AboutSection: React.FC = () => {
-  
   return (
     <div className="bg-white text-gray-900">
       {/* HERO SECTION */}
@@ -169,15 +168,8 @@ const AboutSection: React.FC = () => {
       </section>
 
       {/* CTA SECTION */}
-      <section className="bg-gray-900 text-white py-24 px-6 text-center">
-        <p className="text-gray-400 mb-2">
-          Last week, 12,311 brand new publications got started.
-        </p>
-        <h3 className="text-3xl font-bold mb-8">Today, it's your turn.</h3>
-        <button className="bg-orange-500 hover:bg-orange-600 transition px-8 py-4 rounded-full font-medium">
-          Start a Project
-        </button>
-      </section>
+      <NextSteps />
+      <FooterMinimal />
     </div>
   );
 };
