@@ -2,24 +2,6 @@
 import React from "react";
 import SocialMedia from "./SocialMedia";
 
-const OutlineIcon: React.FC<
-  React.SVGProps<SVGSVGElement> & { label: string }
-> = ({ label, children, ...p }) => (
-  <span className="inline-flex items-center justify-center h-10 w-10 rounded-full ring-1 ring-white/30 hover:ring-white transition">
-    <svg
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      aria-label={label}
-      role="img"
-      className="text-white/80"
-      {...p}
-    >
-      {children}
-    </svg>
-  </span>
-);
-
 const FooterMinimal: React.FC = () => {
   return (
     <footer className="bg-[#0B0B0E] text-white">
