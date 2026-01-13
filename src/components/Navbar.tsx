@@ -131,6 +131,13 @@ const Navbar = () => {
     return () => i18n.off("languageChanged", onChange);
   }, [i18n]);
 
+  const navItems = [
+    { path: "/", label: t("navbar.home") },
+    { path: "/about", label: t("navbar.about") },
+    { path: "/services", label: t("navbar.services") },
+    { path: "/contact", label: t("navbar.contactUs") },
+  ];
+
   return (
     <>
       {isHomePage && (
@@ -148,50 +155,20 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex bg-white rounded-full px-8 py-2 gap-8 border border-white shadow-lg">
-            <Link
-              to="/"
-              className={`text-sm whitespace-nowrap min-w-[48px] ${
-                isActive("/")
-                  ? "font-semibold text-black"
-                  : "font-normal text-black/70 hover:text-black"
-              }`}
-            >
-              {t("navbar.home")}
-            </Link>
-
-            <Link
-              to="/about"
-              className={`text-sm whitespace-nowrap min-w-[120px] ${
-                isActive("/about")
-                  ? "font-semibold text-black"
-                  : "font-normal text-black/70 hover:text-black"
-              }`}
-            >
-              {t("navbar.about")}
-            </Link>
-
-            <Link
-              to="/contact"
-              className={`text-sm whitespace-nowrap min-w-[190px] ${
-                isActive("/contact")
-                  ? "font-semibold text-black"
-                  : "font-normal text-black/70 hover:text-black"
-              }`}
-            >
-              {t("navbar.contactUs")}
-            </Link>
-
-            <Link
-              to="/services"
-              className={`text-sm whitespace-nowrap min-w-[88px] ${
-                isActive("/services")
-                  ? "font-semibold text-black"
-                  : "font-normal text-black/70 hover:text-black"
-              }`}
-            >
-              {t("navbar.services")}
-            </Link>
+          <nav className="hidden md:grid grid-flow-col auto-cols-fr bg-white rounded-full px-8 py-2 gap-6 border border-white shadow-lg">
+            {navItems.map(({ path, label }) => (
+              <Link
+                key={path}
+                to={path}
+                className={`text-sm whitespace-nowrap text-center transition-colors ${
+                  isActive(path)
+                    ? "font-semibold text-black"
+                    : "font-normal text-black/70 hover:text-black"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
 
           {/* Desktop CTA */}
