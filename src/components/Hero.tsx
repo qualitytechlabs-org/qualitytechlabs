@@ -1,10 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// import backgroundOne from '../../../assets/pages/service/background_banner1.png';
-// import backgroundTwo from '../../../assets/pages/service/background_banner2.png';
-// import backgroundThree from '../../../assets/pages/service/background_banner3.png';
-// import heroImage from '../../../assets/pages/service/start_a_project_bg_img.png';
-// import heroMask from '../../../assets/pages/service/start_a_project_bg_img_mask.png';
-// import btn from '../../../assets/pages/service/btn_arrow.png'
 import backgroundOne from '../assets/pages/service/background_banner1.png';
 import backgroundTwo from '../assets/pages/service/background_banner2.png';
 import backgroundThree from '../assets/pages/service/background_banner3.png';
@@ -56,14 +50,13 @@ const Hero: React.FC = () => {
         <div className="service-hero__image-frame">
           <img src={heroImage} alt={`${currentSlide.title} showcase`} className="service-hero__image" />
           <div className="service-hero__image-gradient" />
-          <img src={heroMask} alt="" aria-hidden className="service-hero__image-mask" />
+          <img src={heroMask} alt="quality tech labs" aria-hidden className="service-hero__image-mask" />
 
           <div className="service-hero__content">
-            {/* <h1 className="service-hero__title">{currentSlide.title}</h1> */}
             <p className="service-hero__subtitle">{currentSlide.subtitle}</p>
             <div className="service-hero__cta-row">
               <button className="service-btn service-btn--primary">
-                <img src={btn}  className="btn__image" />
+                <img src={btn}  className="btn__image"  alt="quality tech labs"/>
                 Start a Project</button>
             </div>
           </div>
